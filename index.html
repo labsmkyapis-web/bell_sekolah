@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bell Sekolah Digital</title>
+<style>
+:root{--green:#087a50;--green2:#0ca66b;--bg:#f3f7f5;--ink:#18352a;--muted:#6d8178;--line:#e1ebe5;--red:#d94848}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(120deg,#07583d,#0da36a);color:white;padding:24px clamp(16px,4vw,48px);display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:14px}.logo{width:48px;height:48px;border-radius:15px;background:#ffffff25;display:grid;place-items:center;font-size:25px}.brand h1{font-size:clamp(20px,3vw,28px);margin:0}.brand p{margin:5px 0 0;color:#d9f5e8;font-size:13px}
+.clock{text-align:right}.clock strong{font-size:clamp(25px,4vw,36px);display:block;font-variant-numeric:tabular-nums}.clock span{font-size:12px;color:#d9f5e8}
+main{max-width:1250px;margin:24px auto;padding:0 18px 50px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}.tabs{display:flex;gap:8px;flex-wrap:wrap}.tab,button{border:0;border-radius:10px;padding:11px 15px;font-weight:650;cursor:pointer;font-size:14px}.tab{background:white;color:#486257;border:1px solid var(--line)}.tab.active{background:var(--green);color:white}.btn{background:var(--green);color:white}.btn.secondary{background:#e4f2eb;color:#126344}.btn.danger{background:#fff0f0;color:#b52e2e}.btn.dark{background:#25483a;color:white}.btn:disabled{opacity:.45;cursor:not-allowed}
+.panel{display:none}.panel.active{display:block}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.card{background:white;border:1px solid var(--line);border-radius:16px;padding:19px;box-shadow:0 5px 18px #173e2b08}.span-12{grid-column:span 12}.span-8{grid-column:span 8}.span-6{grid-column:span 6}.span-4{grid-column:span 4}
+.card h2{font-size:17px;margin:0 0 14px}.muted{color:var(--muted);font-size:13px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat{padding:15px;border-radius:12px;background:#f4faf6}.stat b{display:block;font-size:26px;color:var(--green)}.stat span{font-size:12px;color:var(--muted)}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid #d7e4dc;border-radius:9px;background:#fff;font:inherit;color:var(--ink)}label{display:block;font-size:13px;font-weight:650;margin:12px 0 6px}.formrow{display:grid;grid-template-columns:1fr 1fr;gap:12px}.days{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.days label{margin:0;font-weight:500}.days input{width:auto}.day{border:1px solid var(--line);padding:8px 10px;border-radius:8px;background:#f8fbf9}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:12px 9px;border-bottom:1px solid var(--line);vertical-align:middle}th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em}.actions{display:flex;gap:6px;flex-wrap:wrap}.actions button{padding:7px 9px;font-size:12px}.pill{display:inline-block;background:#e8f5ed;color:#176745;padding:5px 8px;border-radius:20px;font-size:11px}
+.next{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#eaf7ef;border:1px solid #d4ecdd;border-radius:12px;padding:15px}.next strong{font-size:23px;color:var(--green)}.empty{text-align:center;padding:28px;color:var(--muted)}.notice{padding:12px 14px;background:#fff8e7;border:1px solid #f1e1b5;border-radius:10px;color:#795b13;font-size:13px;line-height:1.5}
+.uploadbox{border:2px dashed #b9d9c7;border-radius:12px;padding:20px;text-align:center;background:#f8fcf9}.soundrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
+@media(max-width:800px){.span-8,.span-6,.span-4{grid-column:span 12}.clock{text-align:left}.stats{grid-template-columns:1fr 1fr}table{display:block;overflow-x:auto}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand"><div class="logo">
+   <center><img src="https://i.imgur.com/HXscxKK.png" alt="Girl in a jacket" width="60" height="60"></center>
+  
+ </div><div><h1>SMKS YAPIS TIK MIMIKA</h1><p>Sistem jadwal bel otomatis • Pengelolaan nada dering</p></div></div>
+ <div class="clock"><strong id="clock">--:--:--</strong><span id="date">Memuat tanggal…</span></div>
+</header>
+<main>
+ <div class="toolbar">
+  <div class="tabs">
+   <button class="tab active" data-tab="dashboard">Dashboard</button>
+   <button class="tab" data-tab="schedule">Jadwal Bel</button>
+   <button class="tab" data-tab="sounds">Nada Dering</button>
+   <button class="tab" data-tab="settings">Pengaturan</button>
+  </div>
+  <button class="btn dark" id="enableAudio">Aktifkan Audio</button>
+ </div>
+
+ <section id="dashboard" class="panel active">
+  <div class="grid">
+   <div class="card span-8">
+    <h2>Status Sistem</h2>
+    <div class="stats">
+     <div class="stat"><b id="statSchedules">0</b><span>Jadwal aktif</span></div>
+     <div class="stat"><b id="statSounds">0</b><span>Nada tersimpan</span></div>
+     <div class="stat"><b id="statToday">0</b><span>Bel hari ini</span></div>
+    </div>
+    <p class="muted" id="audioStatus" style="margin-top:15px">Audio belum diaktifkan. Tekan tombol “Aktifkan Audio” agar browser mengizinkan suara.</p>
+   </div>
+   <div class="card span-4">
+    <h2>Bel Berikutnya</h2><div class="next"><div><span class="muted">Jadwal terdekat hari ini</span><br><b id="nextName">Belum ada jadwal</b></div><strong id="nextTime">--:--</strong></div>
+    <p class="muted">Hitung berdasarkan hari dan waktu perangkat.</p>
+   </div>
+   <div class="card span-12">
+    <h2>Jadwal Hari Ini</h2><div id="todayList" class="empty">Belum ada jadwal untuk hari ini.</div>
+   </div>
+   <div class="card span-12">
+    <div class="notice"><b>Catatan penting:</b> Agar bel berbunyi, halaman ini harus tetap terbuka dan perangkat tidak dalam mode tidur. Browser dapat membatasi pemutaran otomatis ketika tab ditutup, perangkat terkunci, atau komputer sleep. Klik “Aktifkan Audio” sekali setelah membuka aplikasi.</div>
+   </div>
+  </div>
+ </section>
+
+ <section id="schedule" class="panel">
+  <div class="grid">
+   <div class="card span-4">
+    <h2 id="formTitle">Tambah Jadwal Bel</h2>
+    <form id="scheduleForm">
+     <input type="hidden" id="editId">
+     <label>Nama kegiatan / bel</label><input id="bellName" required placeholder="Contoh: Masuk kelas">
+     <div class="formrow"><div><label>Waktu</label><input id="bellTime" type="time" required></div><div><label>Nada dering</label><select id="bellSound"></select></div></div>
+     <label>Hari aktif</label>
+     <div class="days" id="dayChecks">
+      <label class="day"><input type="checkbox" value="1"> Sen</label><label class="day"><input type="checkbox" value="2"> Sel</label><label class="day"><input type="checkbox" value="3"> Rab</label><label class="day"><input type="checkbox" value="4"> Kam</label><label class="day"><input type="checkbox" value="5"> Jum</label><label class="day"><input type="checkbox" value="6"> Sab</label><label class="day"><input type="checkbox" value="0"> Min</label>
+     </div>
+     <label><input type="checkbox" id="bellEnabled" checked style="width:auto"> Jadwal aktif</label>
+     <div class="actions" style="margin-top:16px"><button class="btn" type="submit">Simpan Jadwal</button><button class="btn secondary" type="button" id="resetForm">Bersihkan</button></div>
+    </form>
+   </div>
+   <div class="card span-8">
+    <h2>Daftar Jadwal Bel</h2>
+    <div style="overflow-x:auto"><table><thead><tr><th>Waktu</th><th>Nama</th><th>Hari</th><th>Nada</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="scheduleRows"></tbody></table></div>
+    <div id="noSchedules" class="empty">Belum ada jadwal. Tambahkan jadwal melalui formulir.</div>
+   </div>
+  </div>
+ </section>
+
+ <section id="sounds" class="panel">
+  <div class="grid">
+   <div class="card span-6">
+    <h2>Upload Nada Dering dari Komputer</h2>
+    <p class="muted">Pilih file audio milik sekolah dari komputer. Format yang disarankan: MP3, WAV, atau OGG.</p>
+    <div class="uploadbox"><div style="font-size:32px">🎵</div><p><b>Pilih file audio</b></p><input type="file" id="soundFile" accept="audio/*"><p class="muted">File disimpan di browser/perangkat ini (tidak diunggah ke server).</p></div>
+    <label>Nama nada dering</label><input id="soundName" placeholder="Contoh: Bel masuk">
+    <button class="btn" id="uploadSound" style="margin-top:12px">Simpan Nada Dering</button>
+    <p class="muted" id="uploadMessage"></p>
+   </div>
+   <div class="card span-6">
+    <h2>Daftar Nada Dering</h2><div id="soundList"></div>
+   </div>
+   <div class="card span-12">
+    <div class="notice">Nada dering bawaan “Nada Standar” selalu tersedia. File audio yang diunggah tersimpan pada browser yang sama menggunakan penyimpanan lokal. Jika data browser dihapus atau berpindah komputer, file perlu diunggah kembali.</div>
+   </div>
+  </div>
+ </section>
+
+ <section id="settings" class="panel">
+  <div class="grid">
+   <div class="card span-6">
+    <h2>Uji Bunyi Bel</h2>
+    <p class="muted">Pilih nada kemudian tekan tombol uji untuk memastikan speaker dan file audio berfungsi.</p>
+    <label>Pilih nada</label><select id="testSound"></select>
+    <label>Durasi bunyi (detik)</label><input id="testDuration" type="number" min="1" max="60" value="5">
+    <button class="btn" id="testBell" style="margin-top:14px">▶ Uji Bunyi</button>
+    <button class="btn danger" id="stopBell" style="margin-top:14px">■ Hentikan</button>
+   </div>
+   <div class="card span-6">
+    <h2>Pengaturan Aplikasi</h2>
+    <label>Nama sekolah</label><input id="schoolName" placeholder="Nama sekolah">
+    <label>Volume bel (0–100%)</label><input id="volume" type="range" min="0" max="100" value="85">
+    <p class="muted">Volume: <b id="volumeLabel">85%</b></p>
+    <button class="btn" id="saveSettings">Simpan Pengaturan</button>
+    <button class="btn secondary" id="exportData" style="margin-top:10px">Ekspor jadwal (JSON)</button>
+    <label>Impor jadwal (JSON)</label><input type="file" id="importData" accept=".json,application/json">
+   </div>
+   <div class="card span-12"><h2>Petunjuk penggunaan</h2><ol class="muted" style="line-height:1.8"><li>Upload nada dering pada menu Nada Dering.</li><li>Buka menu Jadwal Bel, isi nama kegiatan, waktu, hari, dan nada dering.</li><li>Klik Aktifkan Audio saat pertama kali membuka aplikasi.</li><li>Biarkan tab aplikasi tetap terbuka selama jam sekolah.</li><li>Ekspor jadwal secara berkala sebagai cadangan.</li></ol></div>
+  </div>
+ </section>
+</main>
+<footer>Bell Sekolah Digital • Berjalan secara lokal di browser komputer</footer>
+<audio id="audioPlayer" preload="auto"></audio>
+<script>
+const DB_NAME='BellSekolahDB', STORE='sounds';
+let db, schedules=JSON.parse(localStorage.getItem('bellSchedules')||'[]');
+let settings=JSON.parse(localStorage.getItem('bellSettings')||'{"schoolName":"","volume":85}');
+let audioUnlocked=false, currentAudio=null, stopTimer=null;
+const $=id=>document.getElementById(id);
+const days=['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+function saveSchedules(){localStorage.setItem('bellSchedules',JSON.stringify(schedules));renderAll()}
+function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,1);req.onupgradeneeded=()=>req.result.createObjectStore(STORE,{keyPath:'id'});req.onsuccess=()=>{db=req.result;resolve(db)};req.onerror=()=>reject(req.error)})}
+function soundTx(mode='readonly'){return db.transaction(STORE,mode).objectStore(STORE)}
+function getSounds(){return new Promise((resolve,reject)=>{const r=soundTx().getAll();r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
+function getSound(id){return new Promise((resolve,reject)=>{if(id==='default'){resolve(null);return}const r=soundTx().get(id);r.onsuccess=()=>resolve(r.result||null);r.onerror=()=>reject(r.error)})}
+function putSound(s){return new Promise((resolve,reject)=>{const r=soundTx('readwrite').put(s);r.onsuccess=resolve;r.onerror=()=>reject(r.error)})}
+function deleteSound(id){return new Promise((resolve,reject)=>{const r=soundTx('readwrite').delete(id);r.onsuccess=resolve;r.onerror=()=>reject(r.error)})}
+async function renderSounds(){
+ const sounds=await getSounds();const options='<option value="default">Nada Standar</option>'+sounds.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+ $('bellSound').innerHTML=options;$('testSound').innerHTML=options;
+ $('soundList').innerHTML='<div class="soundrow"><div><b>Nada Standar</b><div class="muted">Nada bawaan aplikasi</div></div><button class="btn secondary" onclick="previewSound(\'default\')">▶ Uji</button></div>'+
+ (sounds.map(s=>`<div class="soundrow"><div><b>${esc(s.name)}</b><div class="muted">${(s.blob.size/1024).toFixed(0)} KB</div></div><div class="actions"><button class="btn secondary" onclick="previewSound('${s.id}')">▶ Uji</button><button class="btn danger" onclick="removeSound('${s.id}')">Hapus</button></div></div>`).join('')||'<p class="muted">Belum ada nada yang diunggah.</p>');
+}
+function esc(x){return String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderSchedules(){
+ const body=$('scheduleRows');body.innerHTML='';
+ schedules.sort((a,b)=>a.time.localeCompare(b.time)).forEach(s=>{
+ const tr=document.createElement('tr');tr.innerHTML=`<td><b>${s.time}</b></td><td>${esc(s.name)}</td><td>${s.days.map(d=>days[d]).join(', ')}</td><td>${s.sound==='default'?'Nada Standar':esc(s.soundName||'Audio')}</td><td><span class="pill">${s.enabled?'Aktif':'Nonaktif'}</span></td><td><div class="actions"><button class="btn secondary" data-edit="${s.id}">Edit</button><button class="btn danger" data-del="${s.id}">Hapus</button><button class="btn dark" data-play="${s.id}">Uji</button></div></td>`;
+ body.appendChild(tr)});
+ $('noSchedules').style.display=schedules.length?'none':'block';
+ body.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editSchedule(b.dataset.edit));
+ body.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{if(confirm('Hapus jadwal ini?')){schedules=schedules.filter(x=>x.id!==b.dataset.del);saveSchedules()}});
+ body.querySelectorAll('[data-play]').forEach(b=>b.onclick=()=>{const s=schedules.find(x=>x.id===b.dataset.play);playSound(s.sound,5)});
+}
+function renderDashboard(){
+ const now=new Date(), today=now.getDay(), todays=schedules.filter(s=>s.enabled&&s.days.includes(today)).sort((a,b)=>a.time.localeCompare(b.time));
+ $('statSchedules').textContent=schedules.filter(s=>s.enabled).length;
+ $('statSounds').textContent=(async()=>{} , '…');
+ getSounds().then(x=>$('statSounds').textContent=x.length);
+ $('statToday').textContent=todays.length;
+ const upcoming=todays.find(s=>s.time>now.toTimeString().slice(0,5));
+ $('nextName').textContent=upcoming?upcoming.name:(todays.length?'Semua jadwal hari ini telah lewat':'Tidak ada jadwal');
+ $('nextTime').textContent=upcoming?upcoming.time:'--:--';
+ $('todayList').innerHTML=todays.length?'<div style="overflow-x:auto"><table><thead><tr><th>Waktu</th><th>Kegiatan</th><th>Status</th></tr></thead><tbody>'+todays.map(s=>`<tr><td><b>${s.time}</b></td><td>${esc(s.name)}</td><td>${s.time===now.toTimeString().slice(0,5)?'<span class="pill">Waktu bel</span>':'Terjadwal'}</td></tr>`).join('')+'</tbody></table></div>':'Belum ada jadwal untuk hari ini.';
+}
+function renderAll(){renderSchedules();renderDashboard()}
+function resetForm(){$('scheduleForm').reset();$('editId').value='';$('formTitle').textContent='Tambah Jadwal Bel';$('bellEnabled').checked=true}
+function editSchedule(id){const s=schedules.find(x=>x.id===id);if(!s)return;$('editId').value=id;$('bellName').value=s.name;$('bellTime').value=s.time;$('bellSound').value=s.sound;$('bellEnabled').checked=s.enabled;document.querySelectorAll('#dayChecks input').forEach(c=>c.checked=s.days.includes(+c.value));$('formTitle').textContent='Edit Jadwal Bel';window.scrollTo({top:0,behavior:'smooth'})}
+$('scheduleForm').onsubmit=async e=>{e.preventDefault();const id=$('editId').value||crypto.randomUUID();const sound=$('bellSound').value;const snd=await getSound(sound);const daysSelected=[...document.querySelectorAll('#dayChecks input:checked')].map(c=>+c.value);if(!daysSelected.length){alert('Pilih minimal satu hari.');return}
+ const item={id,name:$('bellName').value.trim(),time:$('bellTime').value,sound,soundName:snd?.name||'Nada Standar',days:daysSelected,enabled:$('bellEnabled').checked};
+ const idx=schedules.findIndex(x=>x.id===id);if(idx>=0)schedules[idx]=item;else schedules.push(item);saveSchedules();resetForm()};
+$('resetForm').onclick=resetForm;
+$('uploadSound').onclick=async()=>{const file=$('soundFile').files[0];if(!file){$('uploadMessage').textContent='Pilih file audio terlebih dahulu.';return}if(!file.type.startsWith('audio/')){$('uploadMessage').textContent='File harus berupa audio.';return}
+ const name=$('soundName').value.trim()||file.name.replace(/\.[^.]+$/,'');await putSound({id:crypto.randomUUID(),name,blob:file,type:file.type});$('soundFile').value='';$('soundName').value='';$('uploadMessage').textContent='Nada dering berhasil disimpan.';await renderSounds();renderAll()};
+async function removeSound(id){if(!confirm('Hapus nada dering ini? Jadwal yang menggunakannya perlu diperbarui.'))return;await deleteSound(id);await renderSounds();renderAll()}
+async function audioFor(id){
+ const player=$('audioPlayer');if(currentAudio){URL.revokeObjectURL(currentAudio);currentAudio=null}
+ if(id==='default'){player.removeAttribute('src');return null}
+ const s=await getSound(id);if(!s)return null;currentAudio=URL.createObjectURL(s.blob);player.src=currentAudio;return player;
+}
+async function playSound(id,duration=8){
+ stopBell();const player=await audioFor(id);const vol=(settings.volume??85)/100;
+ if(player){player.volume=vol;try{await player.play();}catch(e){$('audioStatus').textContent='Audio gagal diputar. Klik Aktifkan Audio dan periksa format file.';return}
+ stopTimer=setTimeout(stopBell,duration*1000);
+ }else{
+  const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)return;
+  const ctx=new Ctx();const notes=[880,660,880,660];let t=ctx.currentTime;
+  notes.forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=f;o.type='sine';g.gain.setValueAtTime(0,t+i*.32);g.gain.linearRampToValueAtTime(.22*vol,t+i*.32+.03);g.gain.setValueAtTime(.22*vol,t+i*.32+.19);g.gain.linearRampToValueAtTime(0,t+i*.32+.25);o.connect(g);g.connect(ctx.destination);o.start(t+i*.32);o.stop(t+i*.32+.27)});
+  stopTimer=setTimeout(()=>ctx.close(),Math.max(1,duration)*1000);
+ }
+}
+function stopBell(){clearTimeout(stopTimer);const p=$('audioPlayer');p.pause();p.currentTime=0}
+async function previewSound(id){await playSound(id,5)}
+$('testBell').onclick=()=>playSound($('testSound').value,Math.max(1,Math.min(60,+$('testDuration').value||5)));
+$('stopBell').onclick=stopBell;
+$('enableAudio').onclick=async()=>{try{const Ctx=window.AudioContext||window.webkitAudioContext;const c=new Ctx();await c.resume();const o=c.createOscillator(),g=c.createGain();g.gain.value=.001;o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.04);setTimeout(()=>c.close(),100);audioUnlocked=true;$('audioStatus').textContent='Audio siap. Pastikan tab tetap terbuka agar jadwal dapat berjalan.';$('enableAudio').textContent='Audio Aktif ✓'}catch(e){alert('Tidak dapat mengaktifkan audio pada browser ini.')}};
+$('volume').oninput=()=>{$('volumeLabel').textContent=$('volume').value+'%'};
+$('saveSettings').onclick=()=>{settings={schoolName:$('schoolName').value,volume:+$('volume').value};localStorage.setItem('bellSettings',JSON.stringify(settings));alert('Pengaturan disimpan.')};
+$('exportData').onclick=()=>{const blob=new Blob([JSON.stringify({schedules,settings},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='cadangan-jadwal-bell.json';a.click();URL.revokeObjectURL(a.href)};
+$('importData').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());if(!Array.isArray(data.schedules))throw Error();if(confirm('Impor akan mengganti seluruh jadwal saat ini. Lanjutkan?')){schedules=data.schedules;localStorage.setItem('bellSchedules',JSON.stringify(schedules));if(data.settings){settings=data.settings;localStorage.setItem('bellSettings',JSON.stringify(settings))}renderAll();alert('Jadwal berhasil diimpor.')}}catch(err){alert('File JSON tidak valid.')}e.target.value=''};
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab,.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.tab).classList.add('active')});
+function updateClock(){const d=new Date();$('clock').textContent=d.toLocaleTimeString('id-ID',{hour12:false});$('date').textContent=d.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});renderDashboard()}
+let lastRung='';
+async function checkBell(){const d=new Date(),time=d.toTimeString().slice(0,5),key=d.toDateString()+'_'+time;if(d.getSeconds()===0&&key!==lastRung){const due=schedules.filter(s=>s.enabled&&s.time===time&&s.days.includes(d.getDay()));if(due.length){lastRung=key;for(const s of due){await playSound(s.sound,8);$('audioStatus').textContent='Bel berbunyi: '+s.name+' ('+time+')'}}}}
+async function init(){await openDB();if(settings.schoolName)$('schoolName').value=settings.schoolName;$('volume').value=settings.volume??85;$('volumeLabel').textContent=(settings.volume??85)+'%';await renderSounds();renderAll();updateClock();setInterval(updateClock,1000);setInterval(checkBell,500)}
+init().catch(e=>{console.error(e);alert('Penyimpanan browser tidak tersedia. Gunakan browser modern seperti Chrome atau Edge.')});
+</script>
+</body>
+</html>
